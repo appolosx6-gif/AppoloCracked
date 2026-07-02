@@ -1,5 +1,6 @@
 {
-  "name": "dpmods-api",
+  "name": "pinocrack-api",
   "version": "1.0.0",
-  "main": "api/index.js"
+  "private": true,
+  "type": "module"
 }

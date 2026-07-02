@@ -1,16 +1,12 @@
 {
   "rewrites": [
     {
-      "source": "/.json",
-      "destination": "/api"
-    },
-    {
-      "source": "/api/(.*)",
-      "destination": "/api/$1"
+      "source": "/keys",
+      "destination": "/api/keys"
     },
     {
       "source": "/(.*)",
-      "destination": "/public/index.html"
+      "destination": "/index.html"
     }
   ],
   "functions": {
