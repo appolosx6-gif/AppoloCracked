@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔑 Key Validation - DPMods Security</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 255, 200, 0.2);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 0 60px rgba(0, 255, 200, 0.1);
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 10px rgba(0, 255, 200, 0.3); }
+            50% { text-shadow: 0 0 30px rgba(0, 255, 200, 0.6); }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 50px;
+            margin-bottom: 10px;
+            display: inline-block;
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        .header h1 {
+            color: #00ffc8;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .header p {
+            color: #8899aa;
+            font-size: 14px;
+            margin-top: 8px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(0, 255, 200, 0.15);
+            color: #00ffc8;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            border: 1px solid rgba(0, 255, 200, 0.3);
+            margin-top: 10px;
+        }
+
+        .input-section {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .input-group input {
+            flex: 1;
+            padding: 14px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            min-width: 200px;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 1px;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #00ffc8;
+            box-shadow: 0 0 20px rgba(0, 255, 200, 0.1);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .input-group input::placeholder {
+            color: #556677;
+            font-family: 'Segoe UI', sans-serif;
+            letter-spacing: 0;
+        }
+
+        .btn-validate {
+            padding: 14px 35px;
+            background: linear-gradient(135deg, #00ffc8, #00cc99);
+            border: none;
+            border-radius: 12px;
+            color: #0a0a0a;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-validate:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(0, 255, 200, 0.3);
+        }
+
+        .btn-validate:active {
+            transform: scale(0.95);
+        }
+
+        .btn-validate:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result-box {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 12px;
+            display: none;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        .result-box.show {
+            display: block;
+        }
+
+        .result-box.success {
+            background: rgba(0, 255, 200, 0.1);
+            border: 1px solid rgba(0, 255, 200, 0.3);
+        }
+
+        .result-box.error {
+            background: rgba(255, 50, 50, 0.1);
+            border: 1px solid rgba(255, 50, 50, 0.3);
+        }
+
+        .result-box.loading {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .result-icon {
+            font-size: 40px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .result-title {
+            text-align: center;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .result-title.success {
+            color: #00ffc8;
+        }
+
+        .result-title.error {
+            color: #ff4444;
+        }
+
+        .result-title.loading {
+            color: #ffcc00;
+        }
+
+        .result-detail {
+            color: #8899aa;
+            text-align: center;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .result-detail strong {
+            color: #fff;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
+        .status-badge.active {
+            background: rgba(0, 255, 200, 0.2);
+            color: #00ffc8;
+        }
+
+        .status-badge.inactive {
+            background: rgba(255, 50, 50, 0.2);
+            color: #ff4444;
+        }
+
+        .status-badge.banned {
+            background: rgba(255, 200, 0, 0.2);
+            color: #ffcc00;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: #445566;
+            font-size: 12px;
+        }
+
+        .footer a {
+            color: #00ffc8;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        .loader {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top-color: #00ffc8;
+            animation: spin 0.8s linear infinite;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        .device-list {
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .device-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 12px;
+            color: #8899aa;
+        }
+
+        .device-item:last-child {
+            border-bottom: none;
+        }
+
+        .device-id {
+            font-family: 'Courier New', monospace;
+            color: #00ffc8;
+        }
+
+        .device-time {
+            color: #556677;
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #00ffc8;
+            border-radius: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            .input-group input {
+                min-width: 100%;
+            }
+            .btn-validate {
+                width: 100%;
+            }
+            .header h1 {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">🔑</div>
+            <h1>Key Validation</h1>
+            <p>DPMods Security System</p>
+            <span class="badge">🟢 System Online</span>
+        </div>
+
+        <!-- Input Section -->
+        <div class="input-section">
+            <div class="input-group">
+                <input type="text" id="keyInput" placeholder="Masukkan Key (contoh: PinokCrack)" autofocus>
+                <button class="btn-validate" id="validateBtn" onclick="validateKey()">
+                    <span id="btnText">Validasi</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Result Box -->
+        <div class="result-box" id="resultBox">
+            <div class="result-icon" id="resultIcon">✅</div>
+            <div class="result-title" id="resultTitle">Valid</div>
+            <div class="result-detail" id="resultDetail">
+                Detail informasi key akan muncul disini
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>© 2026 <a href="https://t.me/AppoloSX6_Channel" target="_blank">DPMods Cracked</a> • All Rights Reserved</p>
+        </div>
+    </div>
+
+    <script>
+        // Data dari API (bisa di fetch dari endpoint)
+        const API_URL = '/api';
+
+        async function validateKey() {
+            const input = document.getElementById('keyInput');
+            const key = input.value.trim();
+            const btn = document.getElementById('validateBtn');
+            const btnText = document.getElementById('btnText');
+            const resultBox = document.getElementById('resultBox');
+            const resultIcon = document.getElementById('resultIcon');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultDetail = document.getElementById('resultDetail');
+
+            if (!key) {
+                resultBox.className = 'result-box show error';
+                resultIcon.textContent = '⚠️';
+                resultTitle.textContent = 'Error';
+                resultTitle.className = 'result-title error';
+                resultDetail.innerHTML = 'Silakan masukkan key terlebih dahulu!';
+                return;
+            }
+
+            // Loading state
+            btn.disabled = true;
+            btnText.innerHTML = '<span class="loader"></span> Memeriksa...';
+            resultBox.className = 'result-box show loading';
+            resultIcon.textContent = '⏳';
+            resultTitle.textContent = 'Memeriksa Key...';
+            resultTitle.className = 'result-title loading';
+            resultDetail.innerHTML = 'Tunggu sebentar...';
+
+            try {
+                // Fetch data dari API
+                const response = await fetch(API_URL);
+                const data = await response.json();
+
+                // Cari key
+                const keys = data.DPMods_Security.Keys;
+                const keyData = keys[key];
+
+                if (keyData) {
+                    // Key ditemukan
+                    const isBanned = keyData.Banned;
+                    const deviceLimit = keyData.DeviceLimit;
+                    const expiryDate = keyData.ExpiryDate;
+                    const username = keyData.Username;
+                    const devices = keyData.Devices;
+                    const deviceCount = Object.keys(devices).length - 1; // Kurangi 'dummy'
+
+                    // Build device list HTML
+                    let deviceHtml = '';
+                    let count = 0;
+                    for (const [id, time] of Object.entries(devices)) {
+                        if (id !== 'dummy' && count < 10) {
+                            deviceHtml += `
+                                <div class="device-item">
+                                    <span class="device-id">${id.substring(0, 12)}...</span>
+                                    <span class="device-time">${time}</span>
+                                </div>
+                            `;
+                            count++;
+                        }
+                    }
+
+                    if (deviceCount === 0) {
+                        deviceHtml = '<div style="text-align:center;color:#556677;padding:10px;">Belum ada device terdaftar</div>';
+                    }
+
+                    // Status badge
+                    let statusBadge = '';
+                    if (isBanned) {
+                        statusBadge = '<span class="status-badge banned">⛔ BANNED</span>';
+                    } else if (new Date(expiryDate) < new Date()) {
+                        statusBadge = '<span class="status-badge inactive">⏰ EXPIRED</span>';
+                    } else {
+                        statusBadge = '<span class="status-badge active">✅ ACTIVE</span>';
+                    }
+
+                    // Result
+                    resultBox.className = 'result-box show success';
+                    resultIcon.textContent = '✅';
+                    resultTitle.textContent = `Key Valid!`;
+                    resultTitle.className = 'result-title success';
+                    resultDetail.innerHTML = `
+                        <div style="text-align:left;">
+                            <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+                                <span>Username</span>
+                                <strong style="color:#00ffc8;">${username}</strong>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+                                <span>Device Limit</span>
+                                <strong style="color:#fff;">${deviceLimit}</strong>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+                                <span>Expiry Date</span>
+                                <strong style="color:#fff;">${expiryDate}</strong>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+                                <span>Devices Registered</span>
+                                <strong style="color:#fff;">${deviceCount} / ${deviceLimit}</strong>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+                                <span>Status</span>
+                                ${statusBadge}
+                            </div>
+                            ${deviceCount > 0 ? `
+                            <div style="margin-top:10px;">
+                                <div style="color:#8899aa;font-size:12px;margin-bottom:5px;">📱 Device List:</div>
+                                <div class="device-list">${deviceHtml}</div>
+                            </div>
+                            ` : ''}
+                        </div>
+                    `;
+                } else {
+                    // Key tidak ditemukan
+                    resultBox.className = 'result-box show error';
+                    resultIcon.textContent = '❌';
+                    resultTitle.textContent = 'Key Tidak Valid';
+                    resultTitle.className = 'result-title error';
+                    resultDetail.innerHTML = `
+                        <p>Key <strong>"${key}"</strong> tidak ditemukan di sistem.</p>
+                        <p style="margin-top:10px;font-size:12px;color:#556677;">Pastikan key yang Anda masukkan benar.</p>
+                    `;
+                }
+
+            } catch (error) {
+                resultBox.className = 'result-box show error';
+                resultIcon.textContent = '⚠️';
+                resultTitle.textContent = 'Error';
+                resultTitle.className = 'result-title error';
+                resultDetail.innerHTML = 'Gagal terhubung ke server. Coba lagi nanti.';
+                console.error(error);
+            }
+
+            // Reset button
+            btn.disabled = false;
+            btnText.textContent = 'Validasi';
+        }
+
+        // Enter key support
+        document.getElementById('keyInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                validateKey();
+            }
+        });
+
+        // Auto focus
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('keyInput').focus();
+        });
+    </script>
+</body>
+</html>
